@@ -48,6 +48,8 @@ const Collection = () => {
   const marketPlaceModule = useMarketplace(
     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
   )
+
+  console.log('marketplaceModule: ', marketPlaceModule)
   // const nftModule = useMemo(() => {
   //   if (!provider) return
   //   console.log('provider: ', provider)

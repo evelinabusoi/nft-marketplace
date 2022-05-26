@@ -42,10 +42,6 @@ const Nft = () => {
       const nfts = await nftModule.getAll()
 
       const selectedNftItem = nfts.find((nft) => {
-        console.log(
-          'ethers.utils.formatEther(nft.metadata.id): ',
-          ethers.utils.parseEther(nft.metadata.id.toString())
-        )
         console.log('router.query.id: ', router.query.id)
         return nft.metadata.id.toString() === router.query.nftId
       })
