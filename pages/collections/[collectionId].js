@@ -1,9 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useWeb3 } from '@3rdweb/hooks'
+import detectEthereumProvider from '@metamask/detect-provider'
+import {
+  useSigner,
+  useSDK,
+  useNFTCollection,
+  useMarketplace,
+} from '@thirdweb-dev/react'
+// import { useWeb3 } from '@3rdweb/hooks'
 import { client } from '../../lib/sanityClient'
-import { ThirdwebSDK } from '@3rdweb/sdk'
+// import { ThirdwebSDK } from '@3rdweb/sdk'
 import Header from '../../components/Header'
 import { CgWebsite } from 'react-icons/cg'
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
@@ -34,39 +41,53 @@ const style = {
 
 const Collection = () => {
   const router = useRouter()
-  const { provider } = useWeb3()
+  // const { provider } = useWeb3()
   const { collectionId } = router.query
   const [collection, setCollection] = useState({})
   const [nfts, setNfts] = useState([])
   const [listings, setListings] = useState([])
+  const nftModule = useNFTCollection(collectionId)
+  const marketPlaceModule = useMarketplace(
+    '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
+  )
+  // const nftModule = useMemo(() => {
+  //   if (!provider) return
+  //   console.log('provider: ', provider)
+  //   // const sdk = new ThirdwebSDK(provider?.getSigner())
+  //   // const sdk = new ThirdwebSDK(signer)
+  //   // return sdk.getNFTModule(collectionId)
+  // }, [provider])
 
-  const nftModule = useMemo(() => {
-    if (!provider) return
-    const sdk = new ThirdwebSDK(provider.getSigner())
-    return sdk.getNFTModule(collectionId)
-  }, [provider])
+  // const marketPlaceModule = useMemo(() => {
+  //   if (!provider) return
+
+  //   const sdk = new ThirdwebSDK(provider.getSigner())
+
+  //   return sdk.getMarketplaceModule(
+  //     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
+  //   )
+  // }, [provider])
+
+  console.log('NftModule: ', nftModule)
+  console.log('MarketplaceModule: ', marketPlaceModule)
 
   // get all NFTs in the collection
   useEffect(() => {
     if (!nftModule) return
     ;(async () => {
-      const nfts = await nftModule.getAll()
-
-      setNfts(nfts)
+      try {
+        const nfts = await nftModule.getAll()
+        console.log('NFTS: ', nfts)
+        setNfts(nfts)
+      } catch (error) {
+        console.log('Error on getting nfts: ', error)
+      }
     })()
+    console.log('CHANGING NFT MPDULE')
   }, [nftModule])
 
-  const marketPlaceModule = useMemo(() => {
-    if (!provider) return
-
-    const sdk = new ThirdwebSDK(provider.getSigner())
-
-    return sdk.getMarketplaceModule(
-      '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
-    )
-  }, [provider])
-
   useEffect(() => {
+    console.log('CHANGING MARKETPLACE MPDULE')
     if (!marketPlaceModule) return
     ;(async () => {
       setListings(await marketPlaceModule.getAllListings())
@@ -95,6 +116,7 @@ const Collection = () => {
 
   useEffect(() => {
     fetchCollectionData()
+    // console.log('changinc')
   }, [collectionId])
 
   console.log(router.query)
@@ -201,7 +223,7 @@ const Collection = () => {
         {nfts.map((nftItem, id) => (
           <NFTCard
             key={id}
-            nftItem={nftItem}
+            nftItem={nftItem.metadata}
             title={collection?.title}
             listings={listings}
           />

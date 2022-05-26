@@ -7,6 +7,8 @@ import NFTImage from '../../components/nft/NFTImage'
 import GeneralDetails from '../../components/nft/GeneralDetails'
 import ItemActivity from '../../components/nft/ItemActivity'
 import Purchase from '../../components/nft/Purchase'
+import { useMarketplace, useNFTCollection } from '@thirdweb-dev/react'
+import { ethers } from 'ethers'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -17,17 +19,23 @@ const style = {
 }
 
 const Nft = () => {
-  const { provider } = useWeb3()
+  // const { provider } = useWeb3()
   const [selectedNft, setSelectedNft] = useState()
   const [listings, setListings] = useState([])
   const router = useRouter()
+  const nftModule = useNFTCollection(
+    '0x45a57eC79b7fa36475527390c93ad7b5f812B2b4'
+  )
+  const marketPlaceModule = useMarketplace(
+    '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
+  )
 
-  const nftModule = useMemo(() => {
-    if (!provider) return
+  // const nftModule = useMemo(() => {
+  //   if (!provider) return
 
-    const sdk = new ThirdwebSDK(provider.getSigner())
-    return sdk.getNFTModule('0x45a57eC79b7fa36475527390c93ad7b5f812B2b4')
-  }, [provider])
+  //   const sdk = new ThirdwebSDK(provider.getSigner())
+  //   return sdk.getNFTModule('0x45a57eC79b7fa36475527390c93ad7b5f812B2b4')
+  // }, [provider])
 
   // get all NFTs in the collection
   useEffect(() => {
@@ -35,20 +43,27 @@ const Nft = () => {
     ;(async () => {
       const nfts = await nftModule.getAll()
 
-      const selectedNftItem = nfts.find((nft) => nft.id === router.query.nftId)
+      const selectedNftItem = nfts.find((nft) => {
+        console.log(
+          'ethers.utils.formatEther(nft.metadata.id): ',
+          ethers.utils.parseEther(nft.metadata.id.toString())
+        )
+        console.log('router.query.id: ', router.query.id)
+        return nft.metadata.id.toString() === router.query.nftId
+      })
 
       setSelectedNft(selectedNftItem)
     })()
   }, [nftModule])
 
-  const marketPlaceModule = useMemo(() => {
-    if (!provider) return
+  // const marketPlaceModule = useMemo(() => {
+  //   if (!provider) return
 
-    const sdk = new ThirdwebSDK(provider.getSigner())
-    return sdk.getMarketplaceModule(
-      '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
-    )
-  }, [provider])
+  //   const sdk = new ThirdwebSDK(provider.getSigner())
+  //   return sdk.getMarketplaceModule(
+  //     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
+  //   )
+  // }, [provider])
 
   useEffect(() => {
     if (!marketPlaceModule) return
@@ -56,6 +71,9 @@ const Nft = () => {
       setListings(await marketPlaceModule.getAllListings())
     })()
   }, [marketPlaceModule])
+
+  console.log('selectedNft: ', selectedNft)
+
   return (
     <div>
       <Header />
@@ -63,13 +81,13 @@ const Nft = () => {
         <div className={style.container}>
           <div className={style.topContent}>
             <div className={style.nftImgContainer}>
-              <NFTImage selectedNft={selectedNft} />
+              <NFTImage selectedNft={selectedNft?.metadata} />
             </div>
             <div className={style.detailsContainer}>
-              <GeneralDetails selectedNft={selectedNft} />
+              <GeneralDetails selectedNft={selectedNft?.metadata} />
               <Purchase
                 isListed={router.query.isListed}
-                selectedNft={selectedNft}
+                selectedNft={selectedNft?.metadata}
                 listings={listings}
                 marketPlaceModule={marketPlaceModule}
               />

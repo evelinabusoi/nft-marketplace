@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BiHeart } from 'react-icons/bi'
 import React from 'react'
 import Router from 'next/router'
+import { ethers } from 'ethers'
 
 const style = {
   wrapper: `bg-[#303339] flex-auto w-[14rem] h-[22rem] my-10 mx-5 rounded-2xl overflow-hidden cursor-pointer`,
@@ -25,7 +26,12 @@ const NFTCard = ({ nftItem, title, listings }) => {
   const [price, setPrice] = useState(0)
 
   useEffect(() => {
-    const listing = listings.find((listing) => listing.asset.id === nftItem.id)
+    const listing = listings.find((listing) => {
+      return (
+        ethers.utils.formatEther(listing.asset.id) ===
+        ethers.utils.formatEther(nftItem.id)
+      )
+    })
     if (Boolean(listing)) {
       setIsListed(true)
       setPrice(listing.buyoutCurrencyValuePerToken.displayValue)

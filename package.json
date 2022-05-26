@@ -8,6 +8,7 @@
   "dependencies": {
     "@3rdweb/hooks": "^1.9.2",
     "@3rdweb/sdk": "^1.42.1",
+    "@metamask/detect-provider": "^1.2.0",
     "@sanity/client": "^3.3.0",
     "@thirdweb-dev/react": "^2.3.11",
     "@thirdweb-dev/sdk": "^2.2.19",
