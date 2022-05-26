@@ -1,5 +1,4 @@
 import '../styles/globals.css'
-// import { ThirdwebWeb3Provider } from '@3rdweb/hooks'
 import { ThirdwebProvider } from '@thirdweb-dev/react'
 import { ChainId } from '@thirdweb-dev/sdk'
 

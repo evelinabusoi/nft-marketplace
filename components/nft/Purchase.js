@@ -3,9 +3,6 @@ import { useEffect, useState } from 'react'
 import { HiTag } from 'react-icons/hi'
 import { IoMdWallet } from 'react-icons/io'
 import toast, { Toaster } from 'react-hot-toast'
-import { MarketplaceModule, ThirdwebSDK } from '@3rdweb/sdk'
-// import { useWeb3 } from '@3rdweb/hooks'
-// import { useAuctionWinner } from '@thirdweb-dev/react'
 import { ethers } from 'ethers'
 
 const style = {

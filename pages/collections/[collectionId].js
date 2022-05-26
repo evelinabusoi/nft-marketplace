@@ -8,9 +8,7 @@ import {
   useNFTCollection,
   useMarketplace,
 } from '@thirdweb-dev/react'
-// import { useWeb3 } from '@3rdweb/hooks'
 import { client } from '../../lib/sanityClient'
-// import { ThirdwebSDK } from '@3rdweb/sdk'
 import Header from '../../components/Header'
 import { CgWebsite } from 'react-icons/cg'
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
