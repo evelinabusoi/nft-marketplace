@@ -2,12 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import detectEthereumProvider from '@metamask/detect-provider'
-import {
-  useSigner,
-  useSDK,
-  useNFTCollection,
-  useMarketplace,
-} from '@thirdweb-dev/react'
+import { useNFTCollection, useMarketplace } from '@thirdweb-dev/react'
 import { client } from '../../lib/sanityClient'
 import Header from '../../components/Header'
 import { CgWebsite } from 'react-icons/cg'
@@ -39,59 +34,45 @@ const style = {
 
 const Collection = () => {
   const router = useRouter()
-  // const { provider } = useWeb3()
   const { collectionId } = router.query
-  const [collection, setCollection] = useState({})
-  const [nfts, setNfts] = useState([])
-  const [listings, setListings] = useState([])
-  const nftModule = useNFTCollection(collectionId)
   const marketPlaceModule = useMarketplace(
     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
   )
+  const nftModule = useNFTCollection(collectionId)
+  const [collection, setCollection] = useState({})
+  const [nfts, setNfts] = useState([])
+  const [listings, setListings] = useState([])
 
-  console.log('marketplaceModule: ', marketPlaceModule)
-  // const nftModule = useMemo(() => {
-  //   if (!provider) return
-  //   console.log('provider: ', provider)
-  //   // const sdk = new ThirdwebSDK(provider?.getSigner())
-  //   // const sdk = new ThirdwebSDK(signer)
-  //   // return sdk.getNFTModule(collectionId)
-  // }, [provider])
+  const getNfts = async () => {
+    try {
+      console.log('NFT MODULE: ', nftModule)
+      const _nfts = await nftModule?.getAll()
+      setNfts(_nfts)
+    } catch (error) {
+      console.log('Error on getting nfts: ', error)
+    }
+  }
 
-  // const marketPlaceModule = useMemo(() => {
-  //   if (!provider) return
-
-  //   const sdk = new ThirdwebSDK(provider.getSigner())
-
-  //   return sdk.getMarketplaceModule(
-  //     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
-  //   )
-  // }, [provider])
-
-  console.log('NftModule: ', nftModule)
-  console.log('MarketplaceModule: ', marketPlaceModule)
+  const getListings = async () => {
+    try {
+      const _listings = await marketPlaceModule?.getListings()
+      setListings(_listings)
+    } catch (error) {
+      console.log('Error on getting listings: ', error)
+    }
+  }
 
   // get all NFTs in the collection
   useEffect(() => {
-    if (!nftModule) return
-    ;(async () => {
-      try {
-        const nfts = await nftModule.getAll()
-        console.log('NFTS: ', nfts)
-        setNfts(nfts)
-      } catch (error) {
-        console.log('Error on getting nfts: ', error)
-      }
-    })()
-    console.log('CHANGING NFT MPDULE')
+    if (nftModule) {
+      getNfts()
+    }
   }, [nftModule])
 
   useEffect(() => {
-    console.log('CHANGING MARKETPLACE MPDULE')
-    if (!marketPlaceModule) return
-    ;(async () => {
-      setListings(await marketPlaceModule.getAllListings())
-    })()
+    if (marketPlaceModule) {
+      getListings()
+    }
   }, [marketPlaceModule])
 
   const fetchCollectionData = async (sanityClient = client) => {
@@ -182,7 +163,7 @@ const Collection = () => {
         <div className={style.midRow}>
           <div className={style.statsContainer}>
             <div className={style.collectionStat}>
-              <div className={style.statValue}>{nfts.length}</div>
+              <div className={style.statValue}>{nfts?.length}</div>
               <div className={style.statName}>items</div>
             </div>
             <div className={style.collectionStat}>
@@ -220,7 +201,7 @@ const Collection = () => {
         </div>
       </div>
       <div className="flex flex-wrap">
-        {nfts.map((nftItem, id) => (
+        {nfts?.map((nftItem, id) => (
           <NFTCard
             key={id}
             nftItem={nftItem.metadata}
