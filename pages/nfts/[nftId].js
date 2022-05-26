@@ -28,42 +28,40 @@ const Nft = () => {
     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
   )
 
-  // const nftModule = useMemo(() => {
-  //   if (!provider) return
+  const getNfts = async () => {
+    try {
+      const _nfts = await nftModule?.getAll()
 
-  //   const sdk = new ThirdwebSDK(provider.getSigner())
-  //   return sdk.getNFTModule('0x45a57eC79b7fa36475527390c93ad7b5f812B2b4')
-  // }, [provider])
-
-  // get all NFTs in the collection
-  useEffect(() => {
-    if (!nftModule) return
-    ;(async () => {
-      const nfts = await nftModule.getAll()
-
-      const selectedNftItem = nfts.find((nft) => {
+      const selectedNftItem = _nfts?.find((nft) => {
         console.log('router.query.id: ', router.query.id)
         return nft.metadata.id.toString() === router.query.nftId
       })
 
       setSelectedNft(selectedNftItem)
-    })()
+    } catch (error) {
+      console.log('Error on getting nfts: ', error)
+    }
+  }
+
+  const getListings = async () => {
+    try {
+      setListings(await marketPlaceModule?.getAllListings())
+    } catch (error) {
+      console.log('Error on getting listings: ', error)
+    }
+  }
+
+  // get all NFTs in the collection
+  useEffect(() => {
+    if (nftModule) {
+      getNfts()
+    }
   }, [nftModule])
 
-  // const marketPlaceModule = useMemo(() => {
-  //   if (!provider) return
-
-  //   const sdk = new ThirdwebSDK(provider.getSigner())
-  //   return sdk.getMarketplaceModule(
-  //     '0x3a6f94861d88733caAdb1aA0515b73530ff57871'
-  //   )
-  // }, [provider])
-
   useEffect(() => {
-    if (!marketPlaceModule) return
-    ;(async () => {
-      setListings(await marketPlaceModule.getAllListings())
-    })()
+    if (marketPlaceModule) {
+      getListings()
+    }
   }, [marketPlaceModule])
 
   console.log('selectedNft: ', selectedNft)
